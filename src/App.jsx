@@ -560,6 +560,10 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
   var [expanded, setExpanded] = useState(initialExpandedChild !== null && initialExpandedChild !== undefined ? initialExpandedChild : null);
   var [ctab, setCtab] = useState("status");
   var [saving, setSaving] = useState(false);
+  var [editMode, setEditMode] = useState(false);
+  var [editName, setEditName] = useState("");
+  var [editDob, setEditDob] = useState("");
+  var [editIdx, setEditIdx] = useState(null);
   var rcols = { danger:["#C62828","#FFEBEE"], warning:["#E65100","#FFF3E0"], info:["#0D47A1","#E3F2FD"], success:[P2,"#E8F5E9"] };
 
   async function handleToggleVac(child, idx, vid) {
@@ -568,6 +572,22 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
     var upd = cur.includes(vid) ? cur.filter(id => id!==vid) : [...cur, vid];
     await onUpdateChild(idx, Object.assign({}, child, { vaccines: upd }));
     setSaving(false);
+  }
+
+  async function handleSaveEdit(child, idx) {
+    if (!editName.trim()) { showToast("Nama tidak boleh kosong", "error"); return; }
+    if (!editDob) { showToast("Tanggal lahir tidak boleh kosong", "error"); return; }
+    setSaving(true);
+    // Pass originalName supaya n8n bisa cari row lama meski nama berubah
+    await onUpdateChild(idx, Object.assign({}, child, { 
+      name: editName, 
+      dob: editDob,
+      originalName: child.name  // nama asli sebelum diedit
+    }));
+    setSaving(false);
+    setEditMode(false);
+    setEditIdx(null);
+    showToast("Data anak berhasil diupdate", "ok");
   }
 
   return (
@@ -609,8 +629,11 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
                 {exp && (
                   <div style={{ borderTop:"1px solid "+BRD }}>
                     <div style={{ display:"flex", borderBottom:"1px solid "+BRD }}>
-                      {[["status","Kartu Vaksin"],["rec","Rekomendasi"],["kipi","KIPI"]].map(t => (
-                        <button key={t[0]} onClick={() => setCtab(t[0])} style={{ flex:1, padding:"9px 4px", border:"none", background:"none", fontSize:11, fontWeight:700, fontFamily:FF, color:ctab===t[0]?P:TL, borderBottom:ctab===t[0]?"2.5px solid "+P:"2.5px solid transparent", cursor:"pointer" }}>{t[1]}</button>
+                      {[["status","Kartu Vaksin"],["rec","Rekomendasi"],["kipi","KIPI"],["edit","Edit"]].map(t => (
+                        <button key={t[0]} onClick={() => {
+                          setCtab(t[0]);
+                          if (t[0]==="edit") { setEditName(child.name); setEditDob(child.dob); setEditIdx(idx); }
+                        }} style={{ flex:1, padding:"9px 4px", border:"none", background:"none", fontSize:11, fontWeight:700, fontFamily:FF, color:ctab===t[0]?P:TL, borderBottom:ctab===t[0]?"2.5px solid "+P:"2.5px solid transparent", cursor:"pointer" }}>{t[1]}</button>
                       ))}
                     </div>
                     <div style={{ padding:"14px 16px" }}>
@@ -671,6 +694,23 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
                             <div style={{ fontFamily:FF, fontWeight:800, fontSize:12, color:P2, marginBottom:4 }}>Kontak Darurat</div>
                             <div style={{ fontFamily:FF, fontSize:12, color:TM }}>Hubungi Puskesmas segera jika anak mengalami reaksi berat.</div>
                           </div>
+                        </div>
+                      )}
+                      {ctab==="edit" && (
+                        <div>
+                          <div style={{ fontFamily:FF, fontSize:12, color:TM, background:"#E8F5E9", padding:"8px 10px", borderRadius:8, marginBottom:12 }}>
+                            Edit data dasar anak. Data vaksin diubah via Kartu Vaksin.
+                          </div>
+                          <div style={{ fontFamily:FF, fontSize:12, fontWeight:700, color:TM, marginBottom:4 }}>Nama Lengkap Anak</div>
+                          <input value={editIdx===idx ? editName : child.name} onChange={e => setEditName(e.target.value)}
+                            style={{ width:"100%", padding:"11px 13px", borderRadius:10, border:"1.5px solid "+BRD, fontSize:14, fontFamily:FF, outline:"none", boxSizing:"border-box", marginBottom:12 }} />
+                          <div style={{ fontFamily:FF, fontSize:12, fontWeight:700, color:TM, marginBottom:4 }}>Tanggal Lahir</div>
+                          <input type="date" value={editIdx===idx ? editDob : child.dob} onChange={e => setEditDob(e.target.value)}
+                            style={{ width:"100%", padding:"11px 13px", borderRadius:10, border:"1.5px solid "+BRD, fontSize:14, fontFamily:FF, outline:"none", boxSizing:"border-box", marginBottom:16 }} />
+                          <button onClick={() => handleSaveEdit(child, idx)} disabled={saving}
+                            style={{ width:"100%", padding:13, border:"none", borderRadius:12, background:saving?"#ccc":"linear-gradient(135deg,#1B5E20,#43A047)", color:"#fff", fontSize:14, fontWeight:800, cursor:saving?"default":"pointer", fontFamily:FF, boxShadow:saving?"none":"0 4px 14px rgba(27,94,32,0.3)" }}>
+                            {saving ? "Menyimpan..." : "Simpan Perubahan"}
+                          </button>
                         </div>
                       )}
                     </div>
