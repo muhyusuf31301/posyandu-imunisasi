@@ -272,7 +272,7 @@ function LoginScreen({ onLogin }) {
 // ─────────────────────────────────────────────
 // SCREEN: HOME
 // ─────────────────────────────────────────────
-function HomeScreen({ posyandu, data, onNav, onLogout }) {
+function HomeScreen({ posyandu, data, onNav, onNavToChild, onLogout }) {
   var allC = (data.mothers || []).flatMap(m => (m.children || []).map(c => Object.assign({}, c, { mother: m })));
   var overdue = allC.filter(c => calcStatus(c).overdue.length > 0);
   var dueNow  = allC.filter(c => { var s = calcStatus(c); return s.overdue.length === 0 && s.due.length > 0; });
@@ -332,8 +332,11 @@ function HomeScreen({ posyandu, data, onNav, onLogout }) {
           var p = getPriority(c);
           var s = calcStatus(c);
           var vn = [...s.overdue, ...s.due].map(v => v.name).join(", ");
+          // Cari index anak di dalam data ibu
+          var mother = (data.mothers || []).find(m => m.nik === c.mother.nik);
+          var childIdx = mother ? (mother.children || []).findIndex(ch => ch.name === c.name && ch.dob === c.dob) : 0;
           return (
-            <Card key={i} style={{ padding:"12px 14px" }}>
+            <Card key={i} style={{ padding:"12px 14px", cursor:"pointer" }} onClick={() => onNavToChild(c.mother.nik, childIdx)}>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:40, height:40, borderRadius:20, background:p.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color:p.color, flexShrink:0 }}>
                   {p.label === "Terlewat" ? "!" : p.label === "Jadwal Ini" ? "+" : "~"}
@@ -343,7 +346,10 @@ function HomeScreen({ posyandu, data, onNav, onLogout }) {
                   <div style={{ fontFamily:FF, fontSize:11, color:TL }}>Ibu: {c.mother.name} - {ageMonths(c.dob)} bulan</div>
                   {vn && <div style={{ fontFamily:FF, fontSize:11, color:p.color, fontWeight:700, marginTop:2 }}>{vn}</div>}
                 </div>
-                <Pill color={p.color} bg={p.bg}>{p.label}</Pill>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
+                  <Pill color={p.color} bg={p.bg}>{p.label}</Pill>
+                  <span style={{ fontFamily:FF, fontSize:11, color:TL }}>Tap untuk detail ›</span>
+                </div>
               </div>
             </Card>
           );
@@ -421,13 +427,23 @@ function EdukasiScreen({ onBack }) {
 // ─────────────────────────────────────────────
 // SCREEN: PENCATATAN
 // ─────────────────────────────────────────────
-function PencatatanScreen({ onBack, data, onDataChange }) {
+function PencatatanScreen({ onBack, data, onDataChange, deepLink, onClearDeepLink }) {
   var [search, setSearch]   = useState("");
   var [filter, setFilter]   = useState("all");
   var [selMother, setSelMother] = useState(null);
   var [addMother, setAddMother] = useState(false);
   var [addChild, setAddChild]   = useState(false);
   var [toast, setToast]     = useState({ msg:"", type:"ok" });
+
+  var mothers = data.mothers || [];
+
+  // Handle deepLink — buka langsung ke ibu + anak tertentu
+  useEffect(() => {
+    if (deepLink && deepLink.motherNik) {
+      var m = mothers.find(m => m.nik === deepLink.motherNik);
+      if (m) setSelMother({ ...m, _openChildIdx: deepLink.childIdx });
+    }
+  }, [deepLink]);
 
   var mothers = data.mothers || [];
 
@@ -477,9 +493,11 @@ function PencatatanScreen({ onBack, data, onDataChange }) {
 
   if (selMother) {
     var cm = mothers.find(m => m.nik===selMother.nik) || selMother;
+    var openChildIdx = selMother._openChildIdx !== undefined ? selMother._openChildIdx : null;
     return (
-      <MotherDetail mother={cm} onBack={() => setSelMother(null)} onAddChild={() => setAddChild(true)}
+      <MotherDetail mother={cm} onBack={() => { setSelMother(null); if (onClearDeepLink) onClearDeepLink(); }} onAddChild={() => setAddChild(true)}
         showToast={showToast}
+        initialExpandedChild={openChildIdx}
         onUpdateChild={async (idx, updated) => {
           try {
             await API.saveAnak(Object.assign({}, updated, { nikIbu: cm.nik }));
@@ -538,8 +556,8 @@ function PencatatanScreen({ onBack, data, onDataChange }) {
 // ─────────────────────────────────────────────
 // SCREEN: MOTHER DETAIL
 // ─────────────────────────────────────────────
-function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast }) {
-  var [expanded, setExpanded] = useState(null);
+function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, initialExpandedChild }) {
+  var [expanded, setExpanded] = useState(initialExpandedChild !== null && initialExpandedChild !== undefined ? initialExpandedChild : null);
   var [ctab, setCtab] = useState("status");
   var [saving, setSaving] = useState(false);
   var rcols = { danger:["#C62828","#FFEBEE"], warning:["#E65100","#FFF3E0"], info:["#0D47A1","#E3F2FD"], success:[P2,"#E8F5E9"] };
@@ -762,9 +780,9 @@ export default function App() {
   var [screen, setScreen]     = useState("login");
   var [data, setData]         = useState({ mothers:[] });
   var [ready, setReady]       = useState(false);
-  var [globalToast, setGlobalToast] = useState({ msg:"", type:"ok" });
+  // deepLink: { motherNik, childIdx } — untuk navigasi langsung dari dashboard ke detail anak
+  var [deepLink, setDeepLink] = useState(null);
 
-  // Setelah login, data sudah di-fetch di LoginScreen
   function handleLogin(p, fetchedData) {
     setPosyandu(p);
     setData(fetchedData || { mothers:[] });
@@ -774,8 +792,12 @@ export default function App() {
 
   function handleDataChange(nd) {
     setData(nd);
-    // Data sudah di-push ke n8n di dalam komponen masing-masing
-    // Ini hanya update state lokal supaya UI langsung re-render
+  }
+
+  // Navigasi dari dashboard ke detail anak tertentu
+  function handleNavToChild(motherNik, childIdx) {
+    setDeepLink({ motherNik, childIdx });
+    setScreen("pencatatan");
   }
 
   if (!ready && screen !== "login") return (
@@ -790,9 +812,9 @@ export default function App() {
     <div style={{ maxWidth:430, margin:"0 auto", minHeight:"100vh", background:BG }}>
       <style>{`*, *::before, *::after { box-sizing: border-box; } body { margin: 0; background: #A5D6A7; } ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: #C8E6C9; border-radius: 2px; } button:active { opacity: 0.82; } @keyframes spin { to { transform: rotate(360deg); } }`}</style>
       {screen==="login"      && <LoginScreen onLogin={handleLogin} />}
-      {screen==="home"       && posyandu && <HomeScreen posyandu={posyandu} data={data} onNav={s => setScreen(s)} onLogout={() => { setPosyandu(null); setScreen("login"); setReady(false); }} />}
+      {screen==="home"       && posyandu && <HomeScreen posyandu={posyandu} data={data} onNav={s => setScreen(s)} onNavToChild={handleNavToChild} onLogout={() => { setPosyandu(null); setScreen("login"); setReady(false); }} />}
       {screen==="edukasi"    && <EdukasiScreen onBack={() => setScreen("home")} />}
-      {screen==="pencatatan" && <PencatatanScreen onBack={() => setScreen("home")} data={data} onDataChange={handleDataChange} />}
+      {screen==="pencatatan" && <PencatatanScreen onBack={() => { setDeepLink(null); setScreen("home"); }} data={data} onDataChange={handleDataChange} deepLink={deepLink} onClearDeepLink={() => setDeepLink(null)} />}
     </div>
   );
 }
