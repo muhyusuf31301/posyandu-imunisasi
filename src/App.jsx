@@ -22,6 +22,16 @@ const API = {
     const text = await r.text();
     try { return JSON.parse(text); } catch(e) { return { success: true }; }
   },
+  deleteIbu: async (nik) => {
+    const r = await fetch(N8N_BASE + "/posyandu/delete-ibu", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ nik }) });
+    const text = await r.text();
+    try { return JSON.parse(text); } catch(e) { return { success: true }; }
+  },
+  deleteAnak: async (nikIbu, name) => {
+    const r = await fetch(N8N_BASE + "/posyandu/delete-anak", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ nikIbu, name }) });
+    const text = await r.text();
+    try { return JSON.parse(text); } catch(e) { return { success: true }; }
+  },
 };
 
 // ─────────────────────────────────────────────
@@ -498,7 +508,24 @@ function PencatatanScreen({ onBack, data, onDataChange, deepLink, onClearDeepLin
       <MotherDetail mother={cm} onBack={() => { setSelMother(null); if (onClearDeepLink) onClearDeepLink(); }} onAddChild={() => setAddChild(true)}
         showToast={showToast}
         initialExpandedChild={openChildIdx}
+        onDeleteIbu={async () => {
+          if (!window.confirm("Hapus Ibu " + cm.name + " beserta semua data anaknya? Tidak bisa dibatalkan.")) return;
+          try {
+            await API.deleteIbu(cm.nik);
+            var nd = Object.assign({}, data, { mothers: mothers.filter(m => m.nik !== cm.nik) });
+            onDataChange(nd);
+            setSelMother(null);
+            showToast("Data ibu dan anak berhasil dihapus", "ok");
+          } catch(e) { showToast("Gagal menghapus, cek koneksi", "error"); }
+        }}
         onUpdateChild={async (idx, updated) => {
+          // updated = null berarti hapus anak
+          if (updated === null) {
+            var nd = Object.assign({}, data, { mothers: mothers.map(m => m.nik!==cm.nik?m:Object.assign({},m,{children:m.children.filter((_,i)=>i!==idx)})) });
+            onDataChange(nd);
+            setSelMother(nd.mothers.find(m => m.nik===cm.nik));
+            return;
+          }
           try {
             await API.saveAnak(Object.assign({}, updated, { nikIbu: cm.nik }));
             var nd = Object.assign({}, data, { mothers: mothers.map(m => m.nik!==cm.nik?m:Object.assign({},m,{children:m.children.map((c,i)=>i===idx?updated:c)})) });
@@ -556,7 +583,7 @@ function PencatatanScreen({ onBack, data, onDataChange, deepLink, onClearDeepLin
 // ─────────────────────────────────────────────
 // SCREEN: MOTHER DETAIL
 // ─────────────────────────────────────────────
-function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, initialExpandedChild }) {
+function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, showToast, initialExpandedChild }) {
   var [expanded, setExpanded] = useState(initialExpandedChild !== null && initialExpandedChild !== undefined ? initialExpandedChild : null);
   var [ctab, setCtab] = useState("status");
   var [saving, setSaving] = useState(false);
@@ -597,12 +624,15 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
         <div style={{ background:"linear-gradient(135deg,#1B5E20,#43A047)", padding:"20px 20px 24px" }}>
           <div style={{ display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:56, height:56, borderRadius:28, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, fontWeight:900, color:"#fff" }}>{(mother.name[0]||"?").toUpperCase()}</div>
-            <div>
+            <div style={{ flex:1 }}>
               <div style={{ fontFamily:FS, fontSize:18, fontWeight:700, color:"#fff" }}>{mother.name}</div>
               <div style={{ fontFamily:FF, fontSize:12, color:"rgba(255,255,255,0.75)" }}>NIK: {mother.nik}</div>
               {mother.phone  && <div style={{ fontFamily:FF, fontSize:12, color:"rgba(255,255,255,0.75)" }}>WA: {mother.phone}</div>}
               {mother.alamat && <div style={{ fontFamily:FF, fontSize:12, color:"rgba(255,255,255,0.75)" }}>Alamat: {mother.alamat}</div>}
             </div>
+            <button onClick={onDeleteIbu} style={{ background:"rgba(255,82,82,0.25)", border:"1px solid rgba(255,82,82,0.5)", borderRadius:20, padding:"6px 12px", color:"#fff", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:FF, flexShrink:0 }}>
+              Hapus Ibu
+            </button>
           </div>
         </div>
         <div style={{ padding:"14px 16px" }}>
@@ -708,8 +738,19 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, showToast, in
                           <input type="date" value={editIdx===idx ? editDob : child.dob} onChange={e => setEditDob(e.target.value)}
                             style={{ width:"100%", padding:"11px 13px", borderRadius:10, border:"1.5px solid "+BRD, fontSize:14, fontFamily:FF, outline:"none", boxSizing:"border-box", marginBottom:16 }} />
                           <button onClick={() => handleSaveEdit(child, idx)} disabled={saving}
-                            style={{ width:"100%", padding:13, border:"none", borderRadius:12, background:saving?"#ccc":"linear-gradient(135deg,#1B5E20,#43A047)", color:"#fff", fontSize:14, fontWeight:800, cursor:saving?"default":"pointer", fontFamily:FF, boxShadow:saving?"none":"0 4px 14px rgba(27,94,32,0.3)" }}>
+                            style={{ width:"100%", padding:13, border:"none", borderRadius:12, background:saving?"#ccc":"linear-gradient(135deg,#1B5E20,#43A047)", color:"#fff", fontSize:14, fontWeight:800, cursor:saving?"default":"pointer", fontFamily:FF, boxShadow:saving?"none":"0 4px 14px rgba(27,94,32,0.3)", marginBottom:10 }}>
                             {saving ? "Menyimpan..." : "Simpan Perubahan"}
+                          </button>
+                          <button onClick={async () => {
+                            if (!window.confirm("Hapus data " + child.name + "? Tindakan ini tidak bisa dibatalkan.")) return;
+                            setSaving(true);
+                            await API.deleteAnak(mother.nik, child.name);
+                            await onUpdateChild(idx, null); // signal hapus
+                            setSaving(false);
+                            showToast("Data anak berhasil dihapus", "ok");
+                          }} disabled={saving}
+                            style={{ width:"100%", padding:13, border:"2px solid #C62828", borderRadius:12, background:"#fff", color:"#C62828", fontSize:14, fontWeight:800, cursor:saving?"default":"pointer", fontFamily:FF }}>
+                            Hapus Data Anak Ini
                           </button>
                         </div>
                       )}
