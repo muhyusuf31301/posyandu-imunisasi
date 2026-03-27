@@ -81,15 +81,24 @@ const KIPI_DATA = [
 function ageWeeks(dob)  { return Math.floor((Date.now() - new Date(dob)) / 604800000); }
 function ageMonths(dob) { return Math.floor((Date.now() - new Date(dob)) / 2629800000); }
 
+function normalizeVaccines(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.map(v => (typeof v === "string" ? { id: v, date: null } : v));
+}
+
+function getGivenIds(raw) {
+  return normalizeVaccines(raw).map(v => v.id);
+}
+
 function calcStatus(child) {
   var w = ageWeeks(child.dob);
-  var given = child.vaccines || [];
+  var givenIds = getGivenIds(child.vaccines);
   return {
     w,
-    overdue:  VACCINES.filter(v => w > v.maxWeeks  && !given.includes(v.id)),
-    due:      VACCINES.filter(v => w >= v.dueWeeks && w <= v.maxWeeks && !given.includes(v.id)),
-    upcoming: VACCINES.filter(v => w < v.dueWeeks  && w >= v.dueWeeks - 4 && !given.includes(v.id)),
-    done:     VACCINES.filter(v => given.includes(v.id)),
+    overdue:  VACCINES.filter(v => w > v.maxWeeks  && !givenIds.includes(v.id)),
+    due:      VACCINES.filter(v => w >= v.dueWeeks && w <= v.maxWeeks && !givenIds.includes(v.id)),
+    upcoming: VACCINES.filter(v => w < v.dueWeeks  && w >= v.dueWeeks - 4 && !givenIds.includes(v.id)),
+    done:     VACCINES.filter(v => givenIds.includes(v.id)),
   };
 }
 
@@ -591,12 +600,19 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, 
   var [editName, setEditName] = useState("");
   var [editDob, setEditDob] = useState("");
   var [editIdx, setEditIdx] = useState(null);
+  var [pendingVac, setPendingVac] = useState(null);
   var rcols = { danger:["#C62828","#FFEBEE"], warning:["#E65100","#FFF3E0"], info:["#0D47A1","#E3F2FD"], success:[P2,"#E8F5E9"] };
 
-  async function handleToggleVac(child, idx, vid) {
+  async function handleToggleVac(child, idx, vid, confirmedDate) {
     setSaving(true);
-    var cur = child.vaccines || [];
-    var upd = cur.includes(vid) ? cur.filter(id => id!==vid) : [...cur, vid];
+    var cur = normalizeVaccines(child.vaccines);
+    var isGiven = cur.some(v => v.id === vid);
+    var upd;
+    if (isGiven) {
+      upd = cur.filter(v => v.id !== vid);
+    } else {
+      upd = [...cur, { id: vid, date: confirmedDate || new Date().toISOString().slice(0, 10) }];
+    }
     await onUpdateChild(idx, Object.assign({}, child, { vaccines: upd }));
     setSaving(false);
   }
@@ -645,7 +661,7 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, 
             var exp = expanded===idx;
             return (
               <Card key={idx} style={{ padding:0, overflow:"hidden" }}>
-                <button onClick={() => { setExpanded(exp?null:idx); setCtab("status"); }} style={{ width:"100%", padding:"14px 16px", display:"flex", alignItems:"center", gap:12, background:"none", border:"none", cursor:"pointer", textAlign:"left" }}>
+                <button onClick={() => { var closing = exp; setExpanded(exp?null:idx); setCtab("status"); if (closing) setPendingVac(null); }} style={{ width:"100%", padding:"14px 16px", display:"flex", alignItems:"center", gap:12, background:"none", border:"none", cursor:"pointer", textAlign:"left" }}>
                   <div style={{ width:42, height:42, borderRadius:21, background:p.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>&#x1F476;</div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontFamily:FF, fontSize:15, fontWeight:800, color:TXT }}>{child.name}</div>
@@ -662,6 +678,7 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, 
                       {[["status","Kartu Vaksin"],["rec","Rekomendasi"],["kipi","KIPI"],["edit","Edit"]].map(t => (
                         <button key={t[0]} onClick={() => {
                           setCtab(t[0]);
+                          setPendingVac(null);
                           if (t[0]==="edit") { setEditName(child.name); setEditDob(child.dob); setEditIdx(idx); }
                         }} style={{ flex:1, padding:"9px 4px", border:"none", background:"none", fontSize:11, fontWeight:700, fontFamily:FF, color:ctab===t[0]?P:TL, borderBottom:ctab===t[0]?"2.5px solid "+P:"2.5px solid transparent", cursor:"pointer" }}>{t[1]}</button>
                       ))}
@@ -671,22 +688,69 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, 
                         <div>
                           {saving && <div style={{ fontFamily:FF, fontSize:11, color:P2, textAlign:"center", marginBottom:8 }}>Menyimpan ke Google Sheets...</div>}
                           {VACCINES.map(v => {
-                            var given = (child.vaccines||[]).includes(v.id);
+                            var givenIds = getGivenIds(child.vaccines);
+                            var given = givenIds.includes(v.id);
+                            var vacRecord = normalizeVaccines(child.vaccines).find(r => r.id === v.id);
+                            var vacDate = vacRecord ? vacRecord.date : null;
                             var isOv  = s.overdue.some(x => x.id===v.id);
                             var isDu  = s.due.some(x => x.id===v.id);
                             var dc    = given?v.color:isOv?"#C62828":isDu?"#E65100":"#E0E0E0";
-                            var tx    = given?"Sudah":isOv?"Terlewat":isDu?"Jadwal ini":"Belum";
+                            var tx    = given
+                              ? (vacDate ? new Date(vacDate).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}) : "Sudah")
+                              : isOv?"Terlewat":isDu?"Jadwal ini":"Belum";
                             var sc    = new Date(new Date(child.dob).getTime()+v.dueWeeks*7*86400000);
+                            var isPending = pendingVac && pendingVac.childIdx === idx && pendingVac.vid === v.id;
                             return (
-                              <div key={v.id} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:9 }}>
-                                <button onClick={() => handleToggleVac(child, idx, v.id)} disabled={saving} style={{ width:28, height:28, borderRadius:14, background:dc, border:"none", cursor:saving?"default":"pointer", flexShrink:0, color:"#fff", fontSize:13, fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:FF, opacity:saving?0.6:1 }}>
-                                  {given?"v":""}
-                                </button>
-                                <div style={{ flex:1 }}>
-                                  <div style={{ fontFamily:FF, fontSize:13, fontWeight:700, color:given?TM:isOv?"#C62828":TXT }}>{v.name}</div>
-                                  <div style={{ fontFamily:FF, fontSize:10, color:TL }}>{v.group} - {sc.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}</div>
+                              <div key={v.id} style={{ marginBottom: 9 }}>
+                                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                                  <button onClick={() => {
+                                    if (given) {
+                                      handleToggleVac(child, idx, v.id, null);
+                                    } else {
+                                      setPendingVac({
+                                        childIdx: idx,
+                                        vid: v.id,
+                                        date: new Date().toISOString().slice(0, 10)
+                                      });
+                                    }
+                                  }} disabled={saving} style={{ width:28, height:28, borderRadius:14, background:isPending?"#FF9800":dc, border:"none", cursor:saving?"default":"pointer", flexShrink:0, color:"#fff", fontSize:13, fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:FF, opacity:saving?0.6:1 }}>
+                                    {given ? "v" : isPending ? "..." : ""}
+                                  </button>
+                                  <div style={{ flex:1 }}>
+                                    <div style={{ fontFamily:FF, fontSize:13, fontWeight:700, color:given?TM:isOv?"#C62828":TXT }}>{v.name}</div>
+                                    <div style={{ fontFamily:FF, fontSize:10, color:TL }}>
+                                      {v.group} - Jadwal: {sc.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"})}
+                                    </div>
+                                  </div>
+                                  <span style={{ fontFamily:FF, fontSize:10, fontWeight:700, color:given?P2:isOv?"#C62828":isDu?"#E65100":TL }}>{tx}</span>
                                 </div>
-                                <span style={{ fontFamily:FF, fontSize:10, fontWeight:700, color:given?P2:isOv?"#C62828":isDu?"#E65100":TL }}>{tx}</span>
+                                {isPending && (
+                                  <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:6, marginLeft:38, background:"#FFF8E1", borderRadius:8, padding:"8px 10px", border:"1px solid #FFD54F" }}>
+                                    <input
+                                      type="date"
+                                      value={pendingVac.date}
+                                      max={new Date().toISOString().slice(0, 10)}
+                                      onChange={e => setPendingVac(pv => Object.assign({}, pv, { date: e.target.value }))}
+                                      style={{ flex:1, padding:"6px 8px", borderRadius:7, border:"1.5px solid "+BRD, fontSize:13, fontFamily:FF, outline:"none" }}
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        handleToggleVac(child, idx, v.id, pendingVac.date);
+                                        setPendingVac(null);
+                                      }}
+                                      disabled={saving}
+                                      style={{ padding:"6px 12px", borderRadius:7, border:"none", background:P, color:"#fff", fontSize:12, fontWeight:700, fontFamily:FF, cursor:"pointer" }}
+                                    >
+                                      Simpan
+                                    </button>
+                                    <button
+                                      onClick={() => setPendingVac(null)}
+                                      style={{ padding:"6px 10px", borderRadius:7, border:"1px solid "+BRD, background:"#fff", color:TM, fontSize:12, fontWeight:700, fontFamily:FF, cursor:"pointer" }}
+                                    >
+                                      Batal
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
@@ -813,7 +877,18 @@ function AddChildForm({ mother, onBack, onSave }) {
   var [err, setErr]       = useState("");
   var [saving, setSaving] = useState(false);
 
-  function toggle(id) { setVac(v => v.includes(id)?v.filter(x=>x!==id):[...v,id]); }
+  function toggleVac(id) {
+    var isGiven = vaccines.some(v => v.id === id);
+    if (isGiven) {
+      setVac(vs => vs.filter(v => v.id !== id));
+    } else {
+      setVac(vs => [...vs, { id, date: new Date().toISOString().slice(0, 10) }]);
+    }
+  }
+
+  function updateVacDate(id, date) {
+    setVac(vs => vs.map(v => v.id === id ? { id, date } : v));
+  }
 
   async function submit() {
     if (!name.trim()) { setErr("Nama anak wajib diisi."); return; }
@@ -841,8 +916,27 @@ function AddChildForm({ mother, onBack, onSave }) {
           <div style={{ fontFamily:FF, fontSize:11, color:TL, marginBottom:8 }}>Centang vaksin yang sudah diberikan (dari buku KIA):</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
             {VACCINES.map(v => {
-              var given = vaccines.includes(v.id);
-              return <button key={v.id} onClick={() => toggle(v.id)} style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid "+(given?v.color:BRD), background:given?v.color:"none", color:given?"#fff":TM, fontSize:11, fontWeight:700, fontFamily:FF, cursor:"pointer" }}>{given?"v ":""}{v.name}</button>;
+              var vacRecord = vaccines.find(r => r.id === v.id);
+              var given = !!vacRecord;
+              return (
+                <div key={v.id} style={{ marginBottom: 4 }}>
+                  <button
+                    onClick={() => toggleVac(v.id)}
+                    style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid "+(given?v.color:BRD), background:given?v.color:"none", color:given?"#fff":TM, fontSize:11, fontWeight:700, fontFamily:FF, cursor:"pointer" }}
+                  >
+                    {given ? "v " : ""}{v.name}
+                  </button>
+                  {given && (
+                    <input
+                      type="date"
+                      value={vacRecord.date || ""}
+                      max={new Date().toISOString().slice(0, 10)}
+                      onChange={e => updateVacDate(v.id, e.target.value)}
+                      style={{ display:"block", marginTop:4, width:"100%", padding:"5px 8px", borderRadius:7, border:"1.5px solid "+BRD, fontSize:11, fontFamily:FF, outline:"none" }}
+                    />
+                  )}
+                </div>
+              );
             })}
           </div>
           {err && <div style={{ fontFamily:FF, color:"#C62828", fontSize:12, marginTop:8 }}>{err}</div>}
