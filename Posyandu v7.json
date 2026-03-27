@@ -646,7 +646,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $('POST /posyandu/anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst searchName = body.originalName || body.name;\nconst searchKey  = String(body.nikIbu).trim() + \"|\" + searchName.trim();\nconst newKey     = String(body.nikIbu).trim() + \"|\" + String(body.name).trim();\n\n// Cari row via _compositeKey yang sudah ada di sheet (dari ArrayFormula)\nconst exists = rows.some(r => \n  String(r._compositeKey || \"\").trim() === searchKey\n);\n\nlet vac = \"[]\";\ntry { vac = JSON.stringify(body.vaccines || []); } catch(e) {}\n\nreturn [{ json: {\n  mode:                exists ? \"update\" : \"append\",\n  NIK_Ibu:             String(body.nikIbu || \"\"),\n  Nama:                body.name      || \"\",\n  DOB:                 body.dob       || \"\",\n  Gender:              body.gender    || \"P\",\n  Vaccines:            vac,\n  CreatedAt:           body.createdAt || new Date().toISOString(),\n  UpdatedAt:           new Date().toISOString(),\n  _compositeKey_where: searchKey,   // untuk WHERE di Update node\n}}];"
+        "jsCode": "const body = $('POST /posyandu/anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst searchName = body.originalName || body.name;\nconst searchKey  = String(body.nikIbu).trim() + \"|\" + searchName.trim();\nconst newKey     = String(body.nikIbu).trim() + \"|\" + String(body.name).trim();\n\n// Cari row via NIK_Ibu + Nama (tidak bergantung ARRAYFORMULA)\nconst exists = rows.some(r =>\n  String(r.NIK_Ibu||'').trim() === String(body.nikIbu||'').trim() &&\n  String(r.Nama||'').trim()    === searchName.trim()\n);\n\nlet vac = \"[]\";\ntry { vac = JSON.stringify(body.vaccines || []); } catch(e) {}\n\nreturn [{ json: {\n  mode:                exists ? \"update\" : \"append\",\n  NIK_Ibu:             String(body.nikIbu || \"\"),\n  Nama:                body.name      || \"\",\n  DOB:                 body.dob       || \"\",\n  Gender:              body.gender    || \"P\",\n  Vaccines:            vac,\n  CreatedAt:           body.createdAt || new Date().toISOString(),\n  UpdatedAt:           new Date().toISOString(),\n  _compositeKey:       newKey,         // plain value, ditulis n8n ke sheet\n  _compositeKey_where: searchKey,      // untuk WHERE di Update node\n}}];"
       },
       "id": "5f4b2d7d-de60-4707-94c8-43c2bcfc924a",
       "name": "Cek Anak",
@@ -711,7 +711,8 @@
             "Gender": "={{ $json.Gender }}",
             "Vaccines": "={{ $json.Vaccines }}",
             "CreatedAt": "={{ $json.CreatedAt }}",
-            "UpdatedAt": "={{ $json.UpdatedAt }}"
+            "UpdatedAt": "={{ $json.UpdatedAt }}",
+            "_compositeKey": "={{ $json._compositeKey }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -772,6 +773,15 @@
             {
               "id": "UpdatedAt",
               "displayName": "UpdatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "_compositeKey",
+              "displayName": "_compositeKey",
               "required": false,
               "defaultMatch": false,
               "display": true,
