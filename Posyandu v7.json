@@ -1,0 +1,1212 @@
+{
+  "name": "Posyandu v7",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "posyandu/data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ffa75567-17f4-4a80-8b29-eeffd3285387",
+      "name": "OPTIONS data",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        528
+      ],
+      "webhookId": "posyandu-opt-data-v7"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "20b4d9ec-30aa-49e5-863c-5f253db4cbf3",
+      "name": "Resp OPTIONS data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "posyandu/ibu",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8b953e05-629a-4709-9877-e6d410c861b3",
+      "name": "OPTIONS ibu",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        672
+      ],
+      "webhookId": "posyandu-opt-ibu-v7"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "713b7e2e-8bc3-48fe-9e12-827a18c59b24",
+      "name": "Resp OPTIONS ibu",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "posyandu/anak",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f192b04c-6b53-4e2a-a3db-8be2b36409f3",
+      "name": "OPTIONS anak",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        816
+      ],
+      "webhookId": "posyandu-opt-anak-v7"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e2de7d30-f4f7-487e-a0ac-6f037f7507fd",
+      "name": "Resp OPTIONS anak",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "path": "posyandu/data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d3834223-1a1e-4525-ba38-d5aa6c371c49",
+      "name": "GET /posyandu/data",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        992
+      ],
+      "webhookId": "posyandu-get-v7"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "18d3a161-c827-451f-a671-2c0c6cb2dc68",
+      "name": "Read Ibu v7",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2544,
+        992
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "0a1aec3e-dfcc-42f8-9c5a-21fa564c00f5",
+      "name": "Read Anak v7",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2800,
+        992
+      ],
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let ibus = [];\nlet anak = [];\n\ntry {\n  const ibuItems = $('Read Ibu v7').all();\n  ibus = ibuItems.map(i => i.json).filter(r => r && r.NIK && String(r.NIK).trim() !== '');\n} catch(e) { ibus = []; }\n\ntry {\n  const anakItems = $('Read Anak v7').all();\n  anak = anakItems.map(i => i.json).filter(r => r && r.NIK_Ibu && String(r.NIK_Ibu).trim() !== '');\n} catch(e) { anak = []; }\n\nconst mothers = ibus.map(ibu => {\n  const children = anak\n    .filter(a => String(a.NIK_Ibu).trim() === String(ibu.NIK).trim())\n    .map(a => {\n      let vaccines = [];\n      try { vaccines = JSON.parse(a.Vaccines || '[]'); } catch(e) {}\n      return { name:a.Nama||'', dob:a.DOB||'', gender:a.Gender||'P', vaccines, createdAt:a.CreatedAt||'' };\n    });\n  return { name:ibu.Nama||'', nik:String(ibu.NIK||''), phone:ibu.Phone||'', alamat:ibu.Alamat||'', createdAt:ibu.CreatedAt||'', children };\n});\n\n// Stringify di sini supaya Respond GET tinggal pakai $json.response\nconst response = JSON.stringify({ mothers });\nreturn [{ json: { mothers, response } }];"
+      },
+      "id": "d0034174-0a37-4259-b6bd-fe0207457254",
+      "name": "Transform v7",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=={{ $json.response }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "ec533a7c-9ed8-44d9-8414-06f2551480e5",
+      "name": "Respond GET",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "posyandu/ibu",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fba8637f-d6a6-452b-b254-3817f6ba240e",
+      "name": "POST /posyandu/ibu",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        1216
+      ],
+      "webhookId": "posyandu-post-ibu-v7"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "c0eb666b-442b-4d8d-a972-8198c8d15887",
+      "name": "Read Ibu (cek)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2544,
+        1216
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('POST /posyandu/ibu').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== '');\nconst exists = rows.some(r => String(r.NIK).trim() === String(body.nik).trim());\nreturn [{ json: {\n  mode:      exists ? \"update\" : \"append\",\n  NIK:       String(body.nik || \"\"),\n  Nama:      body.name      || \"\",\n  Phone:     body.phone     || \"\",\n  Alamat:    body.alamat    || \"\",\n  CreatedAt: body.createdAt || new Date().toISOString(),\n}}];"
+      },
+      "id": "7790ab2a-5a2d-4513-933d-8f2fb2c70a90",
+      "name": "Cek NIK Ibu",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "append",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "58547453-2342-4dd0-8aef-7ef2ea93fe18",
+      "name": "Ibu Append?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NIK": "={{ $json.NIK }}",
+            "Nama": "={{ $json.Nama }}",
+            "Phone": "={{ $json.Phone }}",
+            "Alamat": "={{ $json.Alamat }}",
+            "CreatedAt": "={{ $json.CreatedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NIK",
+              "displayName": "NIK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Alamat",
+              "displayName": "Alamat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3c9bb538-2af8-46d1-beae-2d1874b9f97b",
+      "name": "Append Ibu",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3296,
+        1136
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NIK": "={{ $json.NIK }}",
+            "Nama": "={{ $json.Nama }}",
+            "Phone": "={{ $json.Phone }}",
+            "Alamat": "={{ $json.Alamat }}",
+            "row_number": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NIK",
+              "displayName": "NIK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Alamat",
+              "displayName": "Alamat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "60d4afec-bc8d-42a6-8a15-8b03f7766965",
+      "name": "Update Ibu",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3296,
+        1296
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\":true}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "fe086652-48d2-4076-91ac-3eac05911658",
+      "name": "Respond Ibu",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3536,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "posyandu/anak",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "34ebd6ac-1de4-42db-b083-d13ae9421ba5",
+      "name": "POST /posyandu/anak",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        1488
+      ],
+      "webhookId": "posyandu-post-anak-v7"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "08432721-88ab-4faf-b2ed-be1b8cc79595",
+      "name": "Read Anak (cek)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2544,
+        1488
+      ],
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('POST /posyandu/anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst searchName = body.originalName || body.name;\nconst searchKey  = String(body.nikIbu).trim() + \"|\" + searchName.trim();\nconst newKey     = String(body.nikIbu).trim() + \"|\" + String(body.name).trim();\n\n// Cari row via _compositeKey yang sudah ada di sheet (dari ArrayFormula)\nconst exists = rows.some(r => \n  String(r._compositeKey || \"\").trim() === searchKey\n);\n\nlet vac = \"[]\";\ntry { vac = JSON.stringify(body.vaccines || []); } catch(e) {}\n\nreturn [{ json: {\n  mode:                exists ? \"update\" : \"append\",\n  NIK_Ibu:             String(body.nikIbu || \"\"),\n  Nama:                body.name      || \"\",\n  DOB:                 body.dob       || \"\",\n  Gender:              body.gender    || \"P\",\n  Vaccines:            vac,\n  CreatedAt:           body.createdAt || new Date().toISOString(),\n  UpdatedAt:           new Date().toISOString(),\n  _compositeKey_where: searchKey,   // untuk WHERE di Update node\n}}];"
+      },
+      "id": "5f4b2d7d-de60-4707-94c8-43c2bcfc924a",
+      "name": "Cek Anak",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "append",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8542c090-00d5-4acc-b67c-e7f2e57829bd",
+      "name": "Anak Append?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3056,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "2043915043",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NIK_Ibu": "={{ $json.NIK_Ibu }}",
+            "Nama": "={{ $json.Nama }}",
+            "DOB": "={{ $json.DOB }}",
+            "Gender": "={{ $json.Gender }}",
+            "Vaccines": "={{ $json.Vaccines }}",
+            "CreatedAt": "={{ $json.CreatedAt }}",
+            "UpdatedAt": "={{ $json.UpdatedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NIK_Ibu",
+              "displayName": "NIK_Ibu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gender",
+              "displayName": "Gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vaccines",
+              "displayName": "Vaccines",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "UpdatedAt",
+              "displayName": "UpdatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "15e4619c-3fcc-4615-b034-aad7afa599e0",
+      "name": "Append Anak",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3296,
+        1408
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "2043915043",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NIK_Ibu": "={{ $json.NIK_Ibu }}",
+            "Nama": "={{ $json.Nama }}",
+            "DOB": "={{ $json.DOB }}",
+            "Gender": "={{ $json.Gender }}",
+            "Vaccines": "={{ $json.Vaccines }}",
+            "UpdatedAt": "={{ $json.UpdatedAt }}",
+            "row_number": 0,
+            "_compositeKey": "={{ $json._compositeKey_where }}"
+          },
+          "matchingColumns": [
+            "_compositeKey"
+          ],
+          "schema": [
+            {
+              "id": "NIK_Ibu",
+              "displayName": "NIK_Ibu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nama",
+              "displayName": "Nama",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gender",
+              "displayName": "Gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vaccines",
+              "displayName": "Vaccines",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CreatedAt",
+              "displayName": "CreatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "UpdatedAt",
+              "displayName": "UpdatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "_compositeKey",
+              "displayName": "_compositeKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e758adc7-fe99-432e-8aef-7b42cf161540",
+      "name": "Update Anak",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3296,
+        1568
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\":true}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "0a246346-b66b-43cd-b1af-3574a58724ed",
+      "name": "Respond Anak",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3536,
+        1488
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OPTIONS data": {
+      "main": [
+        [
+          {
+            "node": "Resp OPTIONS data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPTIONS ibu": {
+      "main": [
+        [
+          {
+            "node": "Resp OPTIONS ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPTIONS anak": {
+      "main": [
+        [
+          {
+            "node": "Resp OPTIONS anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET /posyandu/data": {
+      "main": [
+        [
+          {
+            "node": "Read Ibu v7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ibu v7": {
+      "main": [
+        [
+          {
+            "node": "Read Anak v7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Anak v7": {
+      "main": [
+        [
+          {
+            "node": "Transform v7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform v7": {
+      "main": [
+        [
+          {
+            "node": "Respond GET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST /posyandu/ibu": {
+      "main": [
+        [
+          {
+            "node": "Read Ibu (cek)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ibu (cek)": {
+      "main": [
+        [
+          {
+            "node": "Cek NIK Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek NIK Ibu": {
+      "main": [
+        [
+          {
+            "node": "Ibu Append?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ibu Append?": {
+      "main": [
+        [
+          {
+            "node": "Append Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Ibu": {
+      "main": [
+        [
+          {
+            "node": "Respond Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Ibu": {
+      "main": [
+        [
+          {
+            "node": "Respond Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST /posyandu/anak": {
+      "main": [
+        [
+          {
+            "node": "Read Anak (cek)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Anak (cek)": {
+      "main": [
+        [
+          {
+            "node": "Cek Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Anak": {
+      "main": [
+        [
+          {
+            "node": "Anak Append?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anak Append?": {
+      "main": [
+        [
+          {
+            "node": "Append Anak",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Anak": {
+      "main": [
+        [
+          {
+            "node": "Respond Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Anak": {
+      "main": [
+        [
+          {
+            "node": "Respond Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "a809610e-50f5-48a0-ac4e-a5dbbcd578aa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbb8aebb66211e97885974ca75ff0794e69935ee574f8ce06c40626e26334fd"
+  },
+  "id": "Jqkr4NKVUXQjAWkd",
+  "tags": []
+}

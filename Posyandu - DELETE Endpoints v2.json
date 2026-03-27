@@ -332,8 +332,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        2480,
-        768
+        2752,
+        668
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -371,7 +371,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        2768,
+        3296,
         768
       ]
     },
@@ -395,7 +395,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        2752,
+        3024,
         768
       ],
       "alwaysOutputData": true,
@@ -405,6 +405,39 @@
           "name": "muhyusuf31301"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-rownum-notnull",
+              "leftValue": "={{ $json.rowNum }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-has-anak-del-001",
+      "name": "Has Anak?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        768
+      ]
     }
   ],
   "pinData": {},
@@ -512,7 +545,7 @@
       "main": [
         [
           {
-            "node": "Hapus Row (sequential)",
+            "node": "Has Anak?",
             "type": "main",
             "index": 0
           }
@@ -535,6 +568,24 @@
         [
           {
             "node": "Respond Del Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Anak?": {
+      "main": [
+        [
+          {
+            "node": "Hapus Row (sequential)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hapus Row Ibu",
             "type": "main",
             "index": 0
           }
