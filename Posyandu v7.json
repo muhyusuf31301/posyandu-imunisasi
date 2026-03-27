@@ -685,7 +685,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        3056,
+        3336,
         1488
       ]
     },
@@ -799,7 +799,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        3296,
+        3576,
         1408
       ],
       "credentials": {
@@ -831,11 +831,11 @@
             "Gender": "={{ $json.Gender }}",
             "Vaccines": "={{ $json.Vaccines }}",
             "UpdatedAt": "={{ $json.UpdatedAt }}",
-            "row_number": 0,
-            "_compositeKey": "={{ $json._compositeKey }}"
+            "_compositeKey": "={{ $json._compositeKey }}",
+            "row_number": "={{ $json.row_number }}"
           },
           "matchingColumns": [
-            "_compositeKey"
+            "row_number"
           ],
           "schema": [
             {
@@ -934,7 +934,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        3296,
+        3576,
         1568
       ],
       "credentials": {
@@ -973,7 +973,20 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        3536,
+        3816,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Hitung row_number anak berdasarkan NIK_Ibu + originalName\n// Digunakan HANYA saat mode=update\nconst cekResult = $input.first().json;\n\nif (cekResult.mode === 'append') {\n  return [{ json: cekResult }];\n}\n\nconst rows = $('Read Anak (cek)').all()\n  .map(i => i.json)\n  .filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst searchName = cekResult._compositeKey_where.split('|').slice(1).join('|');\nconst nikIbu = String(cekResult.NIK_Ibu || '').trim();\n\nconst idx = rows.findIndex(r =>\n  String(r.NIK_Ibu||'').trim() === nikIbu &&\n  String(r.Nama||'').trim()    === searchName.trim()\n);\n\nif (idx < 0) throw new Error('Anak tidak ditemukan untuk update: ' + searchName);\n\nreturn [{ json: Object.assign({}, cekResult, { row_number: idx + 2 }) }];"
+      },
+      "id": "cari-row-anak-upd-001",
+      "name": "Cari Row Anak (upd)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3080,
         1488
       ]
     }
@@ -1156,7 +1169,7 @@
       "main": [
         [
           {
-            "node": "Anak Append?",
+            "node": "Cari Row Anak (upd)",
             "type": "main",
             "index": 0
           }
@@ -1197,6 +1210,17 @@
         [
           {
             "node": "Respond Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cari Row Anak (upd)": {
+      "main": [
+        [
+          {
+            "node": "Anak Append?",
             "type": "main",
             "index": 0
           }
