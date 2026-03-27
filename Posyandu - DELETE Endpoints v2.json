@@ -1,0 +1,560 @@
+{
+  "name": "Posyandu - DELETE Endpoints v2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "posyandu/delete-anak",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b810c0ad-d80a-4611-80ce-fa65c303b552",
+      "name": "OPTIONS delete-anak",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        96
+      ],
+      "webhookId": "posyandu-opt-del-anak-v2"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e7d71675-5d8a-4dc6-9a38-e0427179a3ef",
+      "name": "Resp OPTIONS delete-anak",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "posyandu/delete-anak",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "82232569-7969-4b0e-a0ba-1d960dbc8bca",
+      "name": "POST delete-anak",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        304
+      ],
+      "webhookId": "posyandu-del-anak-v2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "bcef050a-91b6-46b7-92e0-f1b44c5ac88d",
+      "name": "Read Anak (del anak)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1648,
+        304
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('POST delete-anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst idx = rows.findIndex(r =>\n  String(r.NIK_Ibu||'').trim() === String(body.nikIbu||'').trim() &&\n  String(r.Nama||'').trim()    === String(body.name||'').trim()\n);\n\nif (idx < 0) throw new Error('Anak tidak ditemukan: ' + body.name);\n\nreturn [{ json: { rowNum: idx + 2 } }];"
+      },
+      "id": "6d2ac9bf-51f8-4f62-8515-4cc7c3c7c549",
+      "name": "Cari Row Anak",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "startIndex": "={{ $json.rowNum - 1 }}"
+      },
+      "id": "0837fc57-93a7-4e8c-8185-66935fa40793",
+      "name": "Hapus Row Anak",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2208,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\":true}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "1070d533-a4d1-45af-9c77-925017709cf4",
+      "name": "Respond Del Anak",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "posyandu/delete-ibu",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8ef71c1c-3288-46b2-9fd4-a7a10eaec123",
+      "name": "OPTIONS delete-ibu",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        560
+      ],
+      "webhookId": "posyandu-opt-del-ibu-v2"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e25c14c3-0dcd-46b0-8e74-768c44bfca19",
+      "name": "Resp OPTIONS delete-ibu",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "posyandu/delete-ibu",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5e37054e-d0bb-4886-9315-b168e0650427",
+      "name": "POST delete-ibu",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        768
+      ],
+      "webhookId": "posyandu-del-ibu-v2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "3500e60b-9dd2-461d-89c6-3ee4d02da705",
+      "name": "Read Ibu (del)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1648,
+        768
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "63819979-291d-4a68-a69b-2ff98d28536f",
+      "name": "Read Anak (del ibu)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1920,
+        768
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\n\nconst ibuRow = ibuIdx + 2;\n\n// Anak milik ibu ini, sort descending (hapus row terbawah dulu untuk hindari row shift)\nconst anakRowNums = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .map(({ rowNum }) => rowNum)\n  .sort((a, b) => b - a);\n\nif (anakRowNums.length === 0) {\n  // Tidak ada anak, lanjut ke hapus ibu langsung\n  return [{ json: { rowNum: null, ibuRow } }];\n}\n\nreturn anakRowNums.map(rowNum => ({ json: { rowNum, ibuRow } }));"
+      },
+      "id": "433ba1a2-97ee-43e2-993a-3060361b3cda",
+      "name": "Cari Row Ibu+Anak",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Anak",
+          "mode": "name"
+        },
+        "startIndex": "={{ $json.rowNum - 1 }}"
+      },
+      "id": "118ec6a0-49bc-4694-8b80-8b11c91c8bd3",
+      "name": "Hapus Row (sequential)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2480,
+        768
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\":true}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "GET, POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              }
+            ]
+          }
+        }
+      },
+      "id": "5cd9a528-65df-4554-a0a0-54dad3fab953",
+      "name": "Respond Del Ibu",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1TZf0h5VQA0jWacKREkMMs4zS4MZqEUBTer--coz9ccE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ibu",
+          "mode": "name"
+        },
+        "startIndex": "={{ $json.ibuRow - 1 }}"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Hapus Row Ibu",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2752,
+        768
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "brNsPIfp1ZNpXSuQ",
+          "name": "muhyusuf31301"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OPTIONS delete-anak": {
+      "main": [
+        [
+          {
+            "node": "Resp OPTIONS delete-anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPTIONS delete-ibu": {
+      "main": [
+        [
+          {
+            "node": "Resp OPTIONS delete-ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST delete-anak": {
+      "main": [
+        [
+          {
+            "node": "Read Anak (del anak)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Anak (del anak)": {
+      "main": [
+        [
+          {
+            "node": "Cari Row Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cari Row Anak": {
+      "main": [
+        [
+          {
+            "node": "Hapus Row Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hapus Row Anak": {
+      "main": [
+        [
+          {
+            "node": "Respond Del Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST delete-ibu": {
+      "main": [
+        [
+          {
+            "node": "Read Ibu (del)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ibu (del)": {
+      "main": [
+        [
+          {
+            "node": "Read Anak (del ibu)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Anak (del ibu)": {
+      "main": [
+        [
+          {
+            "node": "Cari Row Ibu+Anak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cari Row Ibu+Anak": {
+      "main": [
+        [
+          {
+            "node": "Hapus Row (sequential)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hapus Row (sequential)": {
+      "main": [
+        [
+          {
+            "node": "Hapus Row Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hapus Row Ibu": {
+      "main": [
+        [
+          {
+            "node": "Respond Del Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "88f07d23-65e5-4559-9d4c-86f262b3ecfa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbb8aebb66211e97885974ca75ff0794e69935ee574f8ce06c40626e26334fd"
+  },
+  "id": "YzBpwcwfpeBlPHkH",
+  "tags": []
+}
