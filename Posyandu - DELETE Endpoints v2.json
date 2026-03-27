@@ -123,7 +123,7 @@
           "value": "Anak",
           "mode": "name"
         },
-        "startIndex": "={{ $json.rowNum - 1 }}"
+        "startIndex": "={{ Math.max(1, $json.rowNum - 1) }}"
       },
       "id": "0837fc57-93a7-4e8c-8185-66935fa40793",
       "name": "Hapus Row Anak",
@@ -301,7 +301,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\n\nconst ibuRow = ibuIdx + 2;\n\n// Anak milik ibu ini, sort descending (hapus row terbawah dulu untuk hindari row shift)\nconst anakRowNums = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .map(({ rowNum }) => rowNum)\n  .sort((a, b) => b - a);\n\nif (anakRowNums.length === 0) {\n  // Tidak ada anak, lanjut ke hapus ibu langsung\n  return [{ json: { rowNum: null, ibuRow } }];\n}\n\nreturn anakRowNums.map(rowNum => ({ json: { rowNum, ibuRow } }));"
+        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\n\nconst ibuRow = ibuIdx + 2;\n\n// Output 0: anak items sorted desc (hapus dari bawah ke atas)\nconst anakItems = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .sort((a, b) => b.rowNum - a.rowNum)\n  .map(({ rowNum }) => ({ json: { rowNum } }));\n\n// Output 1: ibu item (selalu 1 item)\nconst ibuItem = [{ json: { ibuRow } }];\n\nreturn [anakItems, ibuItem];"
       },
       "id": "433ba1a2-97ee-43e2-993a-3060361b3cda",
       "name": "Cari Row Ibu+Anak",
@@ -325,14 +325,14 @@
           "value": "Anak",
           "mode": "name"
         },
-        "startIndex": "={{ $json.rowNum - 1 }}"
+        "startIndex": "={{ Math.max(1, $json.rowNum - 1) }}"
       },
       "id": "118ec6a0-49bc-4694-8b80-8b11c91c8bd3",
       "name": "Hapus Row (sequential)",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        2752,
+        2480,
         668
       ],
       "credentials": {
@@ -371,8 +371,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        3296,
-        768
+        2768,
+        900
       ]
     },
     {
@@ -388,15 +388,15 @@
           "value": "Ibu",
           "mode": "name"
         },
-        "startIndex": "={{ $json.ibuRow - 1 }}"
+        "startIndex": "={{ Math.max(1, $json.ibuRow - 1) }}"
       },
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "name": "Hapus Row Ibu",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        3024,
-        768
+        2480,
+        900
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -405,38 +405,6 @@
           "name": "muhyusuf31301"
         }
       }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "cond-rownum-gt-zero",
-              "leftValue": "={{ $json.rowNum }}",
-              "rightValue": 1,
-              "operator": {
-                "type": "number",
-                "operation": "gte"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "if-has-anak-del-001",
-      "name": "Has Anak?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        2480,
-        768
-      ]
     }
   ],
   "pinData": {},
@@ -544,15 +512,11 @@
       "main": [
         [
           {
-            "node": "Has Anak?",
+            "node": "Hapus Row (sequential)",
             "type": "main",
             "index": 0
           }
-        ]
-      ]
-    },
-    "Hapus Row (sequential)": {
-      "main": [
+        ],
         [
           {
             "node": "Hapus Row Ibu",
