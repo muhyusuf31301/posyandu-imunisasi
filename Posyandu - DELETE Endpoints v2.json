@@ -99,7 +99,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $('POST delete-anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst idx = rows.findIndex(r =>\n  String(r.NIK_Ibu||'').trim() === String(body.nikIbu||'').trim() &&\n  String(r.Nama||'').trim()    === String(body.name||'').trim()\n);\n\nif (idx < 0) throw new Error('Anak tidak ditemukan: ' + body.name);\n\nreturn [{ json: { rowNum: idx + 2 } }];"
+        "jsCode": "const body = $('POST delete-anak').first().json.body;\nconst rows = $input.all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst match = rows.find(r =>\n  String(r.NIK_Ibu||'').trim() === String(body.nikIbu||'').trim() &&\n  String(r.Nama||'').trim()    === String(body.name||'').trim()\n);\n\nif (!match) throw new Error('Anak tidak ditemukan: ' + body.name);\n\nreturn [{ json: { rowNum: match.row_number } }];"
       },
       "id": "6d2ac9bf-51f8-4f62-8515-4cc7c3c7c549",
       "name": "Cari Row Anak",
@@ -301,7 +301,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\nconst ibuRow = ibuIdx + 2;\n\nconst anakItems = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .sort((a, b) => b.rowNum - a.rowNum)\n  .map(({ rowNum }) => ({ json: { rowNum, ibuRow } }));\n\n// Kalau tidak ada anak, tetap output satu item dengan rowNum=0\n// supaya chain tetap jalan ke Hapus Row Ibu\nif (anakItems.length === 0) {\n  return [{ json: { rowNum: 0, ibuRow } }];\n}\nreturn anakItems;"
+        "jsCode": "const body = $('POST delete-ibu').first().json.body;\nconst nik  = String(body.nik || '').trim();\n\n// row_number sudah dari n8n Read node (= sheet row number)\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuMatch = ibuRows.find(r => String(r.NIK||'').trim() === nik);\nif (!ibuMatch) throw new Error('NIK tidak ditemukan: ' + nik);\nconst ibuRow = ibuMatch.row_number;\n\n// Anak milik ibu ini, sorted desc by row_number\nconst anakItems = anakRows\n  .filter(r => String(r.NIK_Ibu||'').trim() === nik)\n  .sort((a, b) => b.row_number - a.row_number)\n  .map(r => ({ json: { rowNum: r.row_number, ibuRow } }));\n\nif (anakItems.length === 0) {\n  return [{ json: { rowNum: 0, ibuRow } }];\n}\nreturn anakItems;"
       },
       "id": "433ba1a2-97ee-43e2-993a-3060361b3cda",
       "name": "Cari Row Ibu+Anak",
@@ -408,7 +408,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Semua items bawa ibuRow - ambil dari item pertama, output sekali\nconst ibuRow = $input.first().json.ibuRow;\nif (!ibuRow || ibuRow < 2) throw new Error('ibuRow tidak valid: ' + ibuRow);\nreturn [{ json: { ibuRow } }];"
+        "jsCode": "// Hapus Row (sequential) output {success:true} - ibuRow hilang\n// Ambil ibuRow dari Cari Row Ibu+Anak yang masih punya datanya\nconst ibuRow = $('Cari Row Ibu+Anak').first().json.ibuRow;\nif (!ibuRow || ibuRow < 2) throw new Error('ibuRow tidak valid: ' + ibuRow);\nreturn [{ json: { ibuRow } }];"
       },
       "id": "ambil-ibu-row-001",
       "name": "Ambil ibuRow",
