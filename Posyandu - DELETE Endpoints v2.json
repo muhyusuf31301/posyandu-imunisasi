@@ -123,7 +123,7 @@
           "value": "Anak",
           "mode": "name"
         },
-        "startIndex": "={{ Math.max(1, $json.rowNum - 1) }}"
+        "startIndex": "={{ Math.max(2, $json.rowNum) }}"
       },
       "id": "0837fc57-93a7-4e8c-8185-66935fa40793",
       "name": "Hapus Row Anak",
@@ -325,7 +325,7 @@
           "value": "Anak",
           "mode": "name"
         },
-        "startIndex": "={{ Math.max(1, $json.rowNum - 1) }}"
+        "startIndex": "={{ Math.max(2, $json.rowNum) }}"
       },
       "id": "118ec6a0-49bc-4694-8b80-8b11c91c8bd3",
       "name": "Hapus Row (sequential)",
@@ -388,7 +388,7 @@
           "value": "Ibu",
           "mode": "name"
         },
-        "startIndex": "={{ Math.max(1, $json.ibuRow - 1) }}"
+        "startIndex": "={{ Math.max(2, $json.ibuRow) }}"
       },
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "name": "Hapus Row Ibu",
