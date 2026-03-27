@@ -832,7 +832,7 @@
             "Vaccines": "={{ $json.Vaccines }}",
             "UpdatedAt": "={{ $json.UpdatedAt }}",
             "row_number": 0,
-            "_compositeKey": "={{ $json._compositeKey_where }}"
+            "_compositeKey": "={{ $json._compositeKey }}"
           },
           "matchingColumns": [
             "_compositeKey"
