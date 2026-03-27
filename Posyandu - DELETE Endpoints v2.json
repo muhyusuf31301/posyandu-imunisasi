@@ -301,7 +301,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\n\nconst ibuRow = ibuIdx + 2;\n\n// Output 0: anak items sorted desc (hapus dari bawah ke atas)\nconst anakItems = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .sort((a, b) => b.rowNum - a.rowNum)\n  .map(({ rowNum }) => ({ json: { rowNum } }));\n\n// Output 1: ibu item (selalu 1 item)\nconst ibuItem = [{ json: { ibuRow } }];\n\nreturn [anakItems, ibuItem];"
+        "jsCode": "const body     = $('POST delete-ibu').first().json.body;\nconst nik      = String(body.nik || '').trim();\nconst ibuRows  = $('Read Ibu (del)').all().map(i => i.json).filter(r => r && r.NIK && r.NIK !== 'NIK');\nconst anakRows = $('Read Anak (del ibu)').all().map(i => i.json).filter(r => r && r.NIK_Ibu && r.NIK_Ibu !== '' && r.NIK_Ibu !== 'NIK_Ibu');\n\nconst ibuIdx = ibuRows.findIndex(r => String(r.NIK||'').trim() === nik);\nif (ibuIdx < 0) throw new Error('NIK tidak ditemukan: ' + nik);\nconst ibuRow = ibuIdx + 2;\n\nconst anakItems = anakRows\n  .map((r, i) => ({ r, rowNum: i + 2 }))\n  .filter(({ r }) => String(r.NIK_Ibu||'').trim() === nik)\n  .sort((a, b) => b.rowNum - a.rowNum)\n  .map(({ rowNum }) => ({ json: { rowNum, ibuRow } }));\n\n// Kalau tidak ada anak, tetap output satu item dengan rowNum=0\n// supaya chain tetap jalan ke Hapus Row Ibu\nif (anakItems.length === 0) {\n  return [{ json: { rowNum: 0, ibuRow } }];\n}\nreturn anakItems;"
       },
       "id": "433ba1a2-97ee-43e2-993a-3060361b3cda",
       "name": "Cari Row Ibu+Anak",
@@ -333,7 +333,7 @@
       "typeVersion": 4,
       "position": [
         2480,
-        668
+        768
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -371,8 +371,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        2768,
-        900
+        3296,
+        768
       ]
     },
     {
@@ -395,8 +395,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
       "position": [
-        2480,
-        900
+        3024,
+        768
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -405,6 +405,19 @@
           "name": "muhyusuf31301"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Semua items bawa ibuRow - ambil dari item pertama, output sekali\nconst ibuRow = $input.first().json.ibuRow;\nif (!ibuRow || ibuRow < 2) throw new Error('ibuRow tidak valid: ' + ibuRow);\nreturn [{ json: { ibuRow } }];"
+      },
+      "id": "ambil-ibu-row-001",
+      "name": "Ambil ibuRow",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        768
+      ]
     }
   ],
   "pinData": {},
@@ -516,13 +529,6 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "Hapus Row Ibu",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
@@ -546,6 +552,28 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Hapus Row Ibu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hapus Row (sequential)": {
+      "main": [
+        [
+          {
+            "node": "Ambil ibuRow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil ibuRow": {
+      "main": [
         [
           {
             "node": "Hapus Row Ibu",
