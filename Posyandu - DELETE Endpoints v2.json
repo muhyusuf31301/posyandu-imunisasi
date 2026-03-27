@@ -412,17 +412,16 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "loose"
+            "typeValidation": "strict"
           },
           "conditions": [
             {
-              "id": "cond-rownum-notnull",
+              "id": "cond-rownum-gt-zero",
               "leftValue": "={{ $json.rowNum }}",
-              "rightValue": "",
+              "rightValue": 1,
               "operator": {
-                "type": "object",
-                "operation": "notEmpty",
-                "singleValue": true
+                "type": "number",
+                "operation": "gte"
               }
             }
           ],
