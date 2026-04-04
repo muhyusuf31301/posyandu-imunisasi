@@ -38,7 +38,7 @@ const API = {
 // DATA
 // ─────────────────────────────────────────────
 const POSYANDU_LIST = [
-  { id:"melati", name:"Posyandu Melati", kelurahan:"Kel. Sukamaju", kecamatan:"Kec. Cibeunying", kota:"Kota Bandung", jadwal:"Setiap Selasa minggu ke-2", kader:"Ibu Sari & Ibu Dewi" },
+  { id:"bougenville", name:"Posyandu Bougenville", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-1", kader:"Perawat Dwi & Bidan Yolanda" },
 ];
 
 const VACCINES = [
@@ -137,9 +137,9 @@ function buildWALink(child, motherName, phone) {
   var m = ageMonths(child.dob);
   var msg = "";
   if (s.overdue.length > 0) {
-    msg = "Assalamualaikum Ibu " + motherName + "\n\nKami dari Posyandu Melati ingin mengingatkan bahwa putra/putri Ibu, " + child.name + " (" + m + " bulan), memiliki vaksin yang BELUM diberikan:\n\n" + s.overdue.map(v => "- " + v.full).join("\n") + "\n\nMohon segera bawa si kecil ke Posyandu atau Puskesmas.\nJadwal posyandu: Selasa minggu ke-2.\n\nTerima kasih Bu";
+    msg = "Assalamualaikum Ibu " + motherName + "\n\nKami dari Posyandu Bougenville ingin mengingatkan bahwa putra/putri Ibu, " + child.name + " (" + m + " bulan), memiliki vaksin yang BELUM diberikan:\n\n" + s.overdue.map(v => "- " + v.full).join("\n") + "\n\nMohon segera bawa si kecil ke Posyandu atau Puskesmas.\nJadwal posyandu: Sabtu minggu ke-1.\n\nTerima kasih Bu";
   } else if (s.due.length > 0) {
-    msg = "Assalamualaikum Ibu " + motherName + "\n\nPengingat dari Posyandu Melati:\n\nPutra/putri Ibu, " + child.name + " (" + m + " bulan), sudah waktunya mendapatkan:\n\n" + s.due.map(v => "- " + v.full).join("\n") + "\n\nSilakan hadir di posyandu sesuai jadwal. Imunisasi gratis!\n\nTerima kasih";
+    msg = "Assalamualaikum Ibu " + motherName + "\n\nPengingat dari Posyandu Bougenville:\n\nPutra/putri Ibu, " + child.name + " (" + m + " bulan), sudah waktunya mendapatkan:\n\n" + s.due.map(v => "- " + v.full).join("\n") + "\n\nSilakan hadir di posyandu sesuai jadwal. Imunisasi gratis!\n\nTerima kasih";
   }
   var clean = phone.replace(/\D/g, "").replace(/^0/, "62");
   return "https://wa.me/" + clean + "?text=" + encodeURIComponent(msg);
