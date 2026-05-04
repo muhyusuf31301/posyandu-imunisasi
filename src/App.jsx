@@ -39,6 +39,8 @@ const API = {
 // ─────────────────────────────────────────────
 const POSYANDU_LIST = [
   { id:"bougenville", name:"Posyandu Bougenville", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-1", kader:"Perawat Dwi & Bidan Yolanda" },
+  { id:"tomat", name:"Posyandu Tomat", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-2", kader:"Perawat Salsa & Bidan Manda" },
+  { id:"leci", name:"Posyandu Leci", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-3", kader:"Perawat Hartini & Bidan Rina" },
 ];
 
 const VACCINES = [
