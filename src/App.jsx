@@ -1,47 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-
-// ─────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────
-const N8N_BASE = "https://n8n.srv860107.hstgr.cloud/webhook";
-
-const API = {
-  getData: async () => {
-    const r = await fetch(N8N_BASE + "/posyandu/data");
-    const text = await r.text();
-    const clean = text.trim().startsWith("=") ? text.trim().slice(1) : text.trim();
-    try { return JSON.parse(clean); } catch(e) { return { mothers: [] }; }
-  },
-  saveIbu: async (ibu) => {
-    const r = await fetch(N8N_BASE + "/posyandu/ibu", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(ibu) });
-    const text = await r.text();
-    try { return JSON.parse(text); } catch(e) { return { success: true }; }
-  },
-  saveAnak: async (anak) => {
-    const r = await fetch(N8N_BASE + "/posyandu/anak", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(anak) });
-    const text = await r.text();
-    try { return JSON.parse(text); } catch(e) { return { success: true }; }
-  },
-  deleteIbu: async (nik) => {
-    const r = await fetch(N8N_BASE + "/posyandu/delete-ibu", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ nik }) });
-    const text = await r.text();
-    try { return JSON.parse(text); } catch(e) { return { success: true }; }
-  },
-  deleteAnak: async (nikIbu, name) => {
-    const r = await fetch(N8N_BASE + "/posyandu/delete-anak", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ nikIbu, name }) });
-    const text = await r.text();
-    try { return JSON.parse(text); } catch(e) { return { success: true }; }
-  },
-};
+import { API } from './api.js'
+import POSYANDU_LIST from './data/posyandu.json'
 
 // ─────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────
-const POSYANDU_LIST = [
-  { id:"bougenville", name:"Posyandu Bougenville", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-1", kader:"Perawat Dwi & Bidan Yolanda" },
-  { id:"tomat", name:"Posyandu Tomat", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-2", kader:"Perawat Salsa & Bidan Manda" },
-  { id:"leci", name:"Posyandu Leci", kelurahan:"Kel. Dupak", kecamatan:"Kec. Krembangan", kota:"Kota Surabaya", jadwal:"Setiap Sabtu minggu ke-3", kader:"Perawat Hartini & Bidan Rina" },
-];
 
 const VACCINES = [
   { id:"hb0",  name:"HB-0",           full:"Hepatitis B dosis pertama",       dueWeeks:0,  maxWeeks:1,  color:"#FF6B6B", group:"Lahir" },
@@ -623,7 +586,7 @@ function MotherDetail({ mother, onBack, onAddChild, onUpdateChild, onDeleteIbu, 
     if (!editName.trim()) { showToast("Nama tidak boleh kosong", "error"); return; }
     if (!editDob) { showToast("Tanggal lahir tidak boleh kosong", "error"); return; }
     setSaving(true);
-    // Pass originalName supaya n8n bisa cari row lama meski nama berubah
+    // Pass originalName supaya baris lama tetap ketemu meski nama berubah
     await onUpdateChild(idx, Object.assign({}, child, { 
       name: editName, 
       dob: editDob,
